@@ -1,0 +1,19 @@
+19.9.2023 1. GitRepository angelegt 
+19.9.2023 2. Auswahl Machine Learning Algorithmus
+	- Lineare Regression
+		-->not good for this project			
+	- Logistische Regression
+		-->  not good for this project
+	- K-nearest neighbour
+		--> not good for this project
+	- Support-Vector Machine
+		--> not good for this project 
+	- Naive Bayes
+		--> good for this project (example: type a MTG cardtext 
+		    and show % of high likely it is part of a color/colorpair)
+	- Randomforest
+		--> not good for this project 
+	- PCA
+		--> not good for this project
+	- K-means
+		--> not good for this project
