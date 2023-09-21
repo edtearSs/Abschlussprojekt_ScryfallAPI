@@ -3,6 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scryfallAPI import fetch_card, MaximumRequestDone, WrongCardName
+from naive_bayes_machine_learning import get_dataframe
 
 st.set_page_config(layout="wide")
 sns.set_theme()
@@ -20,3 +21,22 @@ if name:
         st.error("The provided Pokemon name is not valid.")
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
+
+df = get_dataframe()
+
+# Convert the "Type Line" column to lowercase for case-insensitive comparison
+df = get_dataframe()
+
+# Filter rows based on the "Type Line" condition
+filtered_df = df[~df['Type Line'].apply(lambda x: 'token' in x.lower() or 'card//card' in x.lower())]
+
+# Reset the index of the filtered DataFrame
+filtered_df.reset_index(drop=True, inplace=True)
+
+# Create a copy of the filtered DataFrame before dropping rows
+filtered_df_copy = filtered_df.copy()
+
+# Drop rows with missing values in specified columns
+filtered_df_copy.dropna(axis='index', subset=['Oracle Text'], inplace=True)
+
+st.write(filtered_df_copy)
