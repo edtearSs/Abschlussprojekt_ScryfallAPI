@@ -28,7 +28,17 @@ df = get_dataframe()
 df = get_dataframe()
 
 # Filter rows based on the "Type Line" condition
-filtered_df = df[~df['Type Line'].apply(lambda x: 'token' in x.lower() or 'card//card' in x.lower())]
+filtered_word = ['plane']
+filtered_df = df[~df['Type Line'].apply(lambda x: x.lower() in filtered_word or 'token' in x.lower()
+                                                  or 'card' in x.lower() or 'scheme' in x.lower()
+                                                  or 'vanguard' in x.lower() or 'emblem' in x.lower()
+                                                  or 'hero' in x.lower() or 'conspiracy' in x.lower()
+                                                  or 'phenomenon' in x.lower() or 'stickers' in x.lower()
+                                                  or 'summon' in x.lower() or 'tolkien' in x.lower()
+                                                  or 'plane — ' in x.lower())]
+
+
+
 
 # Reset the index of the filtered DataFrame
 filtered_df.reset_index(drop=True, inplace=True)
