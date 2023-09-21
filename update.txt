@@ -17,3 +17,8 @@
 		--> not good for this project
 	- K-means
 		--> not good for this project
+21.9.2023 1. create python files for the project
+	- main is supposed to be the streamlit overview
+	- naive_bayes is supposed to be the code that entails all the 
+	machine learning aspects to use the data for
+	- scryfallAPI adds the scryfall API to the project as a JSON file.
