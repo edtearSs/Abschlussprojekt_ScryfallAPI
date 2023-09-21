@@ -22,3 +22,10 @@
 	- naive_bayes is supposed to be the code that entails all the 
 	machine learning aspects to use the data for
 	- scryfallAPI adds the scryfall API to the project as a JSON file.
+21.09.2023 2. added code to load data with the API
+21.09.2023 3. added data.py for functions using the extracted data
+21.09.2023 4. added API use for single card search and addes search bar for single card search
+21.09.2023 5. added bulk data function to scryfallAPI.py
+21.09.2023 6. added get_dataframe function to naive_bayes.py
+21.09.2023 7. added filter to the dataframe
+21.09.2023 !!! Filter not working correctly, problem probably with the JSON file?
