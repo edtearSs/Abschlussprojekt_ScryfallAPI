@@ -1,7 +1,7 @@
 import requests
 import json
 
-BASE_URL = "https://api.scryfall.com"
+CARD_URL = "https://api.scryfall.com/cards/named?exact"
 
 class WrongCardName(Exception):
     pass
@@ -11,7 +11,7 @@ class MaximumRequestDone(Exception):
 
 def fetch_card(name):
     try:
-        url = f"{BASE_URL}/{name}"
+        url = f"{CARD_URL}={name}"
         print(f"making request to {url}")
         data = requests.get(url)
         return data.json()
