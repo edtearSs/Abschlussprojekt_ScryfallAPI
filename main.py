@@ -3,18 +3,34 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scryfallAPI import fetch_card, MaximumRequestDone, WrongCardName
-from naive_bayes_machine_learning import get_dataframe
+from naive_bayes_machine_learning import get_dataframe, analyze
 
 st.set_page_config(layout="wide")
 sns.set_theme()
 
-name = st.text_input("Kartenname", placeholder="Schreib hier einen Kartennamen.")
+col1, col2 = st.columns(2)
+
+if "vect" not in st.session_state:
+    # Der Vectorizer für unser Model
+    # (https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html)
+    st.session_state.vect = None
+
+if "model" not in st.session_state:
+    # Das Modell, ein Naive Bayes
+    # (https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html#sklearn.naive_bayes.MultinomialNB)
+    st.session_state.model = None
+
+if "data" not in st.session_state:
+    # Hier muss der Dataframe in den session state aufgenommen werden
+    st.session_state.data = get_dataframe()
+
+name = st.sidebar.text_input("Kartenname", placeholder="Schreib hier einen Kartennamen.")
 print(name)
 
 if name:
     try:
         data = fetch_card(name.lower())
-        st.write(data)
+        st.sidebar.write(data)
     except MaximumRequestDone:
         st.error("Maximum number of requests reached. Please try again later.")
     except WrongCardName:
@@ -22,31 +38,28 @@ if name:
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
 
-df = get_dataframe()
+with col1:
 
-# Convert the "Type Line" column to lowercase for case-insensitive comparison
-df = get_dataframe()
+    st.dataframe(st.session_state.data, width=800)
 
-# Filter rows based on the "Type Line" condition
-filtered_word = ['plane']
-filtered_df = df[~df['Type Line'].apply(lambda x: x.lower() in filtered_word or 'token' in x.lower()
-                                                  or 'card' in x.lower() or 'scheme' in x.lower()
-                                                  or 'vanguard' in x.lower() or 'emblem' in x.lower()
-                                                  or 'hero' in x.lower() or 'conspiracy' in x.lower()
-                                                  or 'phenomenon' in x.lower() or 'stickers' in x.lower()
-                                                  or 'summon' in x.lower() or 'tolkien' in x.lower()
-                                                  or 'plane — ' in x.lower())]
+with col2:
+    selection = st.multiselect("Oracle Text", st.session_state.data.keys())
 
+    analyse = st.button("Analysiere ausgewählte Keywords", help="Erstellt ein Modell mit den ausgewählten Keywords.")
 
+    if analyse and selection != []:
+        m = {}
 
+        for sel in selection:
+            m[sel] = st.session_state.data[sel]
 
-# Reset the index of the filtered DataFrame
-filtered_df.reset_index(drop=True, inplace=True)
+        if m != {}:
+            st.session_state.model, st.session_state.vect = analyze(m)
 
-# Create a copy of the filtered DataFrame before dropping rows
-filtered_df_copy = filtered_df.copy()
+    text = st.text_input("Which color is this text most likely to be part of?")
 
-# Drop rows with missing values in specified columns
-filtered_df_copy.dropna(axis='index', subset=['Oracle Text'], inplace=True)
+    if st.session_state.model != None and st.session_state.vect != None:
+        propas = st.session_state.model.predict_proba(st.session_state.vect.transform([text]))
 
-st.write(filtered_df_copy)
+        for i in range(len(st.session_state.model.classes_)):
+            st.markdown(f"**{st.session_state.model.classes_[i]}**: {propas[0][i]*100:.2f} % ")
