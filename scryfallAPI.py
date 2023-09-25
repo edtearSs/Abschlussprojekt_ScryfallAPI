@@ -1,7 +1,7 @@
 import requests
 import json
 
-CARD_URL = "https://api.scryfall.com/cards/named?exact"
+CARD_URL = "https://api.scryfall.com/cards/named?fuzzy"
 
 class WrongCardName(Exception):
     pass
