@@ -30,3 +30,7 @@
 21.09.2023 7. added filter to the dataframe
 21.09.2023 !!! Filter not working correctly, problem probably with the JSON file?
 21.09.2023 8. Fixed filter not working correctly
+25.09.2023 1. changing WUBRG +C in colors to Indexes 0-5 in naive_bayes.py analyze function
+25.09.2023 2. removed unnecessary code in main.py
+25.09.2023 3. changed dataframe filtering to not include multicolored and colorless magic cards to simplify the data for the algorithm
+25.09.2023 4. updated analyze() function to correctly train the model for the project
