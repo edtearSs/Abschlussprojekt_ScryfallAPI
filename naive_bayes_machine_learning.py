@@ -4,7 +4,6 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.preprocessing import MultiLabelBinarizer
 
 from scryfallAPI import get_bulk_data
 
@@ -22,12 +21,13 @@ def get_dataframe():
         rarity = currentItem.get("rarity", "")
         type_line = currentItem.get("type_line", "")
 
-        # Filter out cards with more than one color
-        if len(colors) == 1:
-            rows.append([card_name, mana_cost, oracle_text, colors[0], color_identity, rarity, type_line])
+        # Create a list of colors as a string
+        color_str = ', '.join(colors)
+
+        rows.append([card_name, mana_cost, oracle_text, color_str, color_identity, rarity, type_line])
 
     # Create a DataFrame from the list of rows
-    df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Color", "Color Identity", "Rarity", "Type Line"])
+    df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity", "Type Line"])
 
     filtered_df = df[~df['Type Line'].apply(lambda x: 'token' in x.lower()
                                                       or 'card' in x.lower() or 'scheme' in x.lower()
@@ -52,18 +52,21 @@ def get_dataframe():
 def analyze():
     df = get_dataframe()
 
-    df = df.drop(['Card Name', 'Mana Cost', 'Color Identity', 'Rarity', 'Type Line'], axis=1)
-    st.dataframe(df)
+    # Create a separate DataFrame for single-colored cards
+    single_color_df = df[df['Colors'].apply(lambda x: len(x.split(', ')) == 1)]
+
+    single_color_df = single_color_df.drop(['Card Name', 'Mana Cost', 'Color Identity', 'Rarity', 'Type Line'], axis=1)
+    st.dataframe(single_color_df)
 
     vect = CountVectorizer()
-    wordsCountArray = vect.fit_transform(df['Oracle Text'])
+    wordsCountArray = vect.fit_transform(single_color_df['Oracle Text'])
 
-    X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, df['Color'], test_size=0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, single_color_df['Colors'], test_size=0.2, random_state=0)
 
     model = MultinomialNB()
     model.fit(X_train, y_train)
 
-    s = f"Model trained for {X_train.shape[0]} cards. \n\n"
+    s = f"Model trained for {X_train.shape[0]} single-colored cards. \n\n"
     s += f"Model Accuracy: {model.score(X_test, y_test) * 100:.2f}%"
 
     st.markdown(s)
