@@ -4,12 +4,12 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import MultiLabelBinarizer
 
 from scryfallAPI import get_bulk_data
 
 def get_dataframe():
     data = get_bulk_data()
-    #print(data)
     rows = []
 
     # Iterate through the data and append rows to the list
@@ -22,10 +22,12 @@ def get_dataframe():
         rarity = currentItem.get("rarity", "")
         type_line = currentItem.get("type_line", "")
 
-        rows.append([card_name, mana_cost, oracle_text, colors, color_identity, rarity, type_line])
+        # Filter out cards with more than one color
+        if len(colors) == 1:
+            rows.append([card_name, mana_cost, oracle_text, colors[0], color_identity, rarity, type_line])
 
     # Create a DataFrame from the list of rows
-    df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity", "Type Line"])
+    df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Color", "Color Identity", "Rarity", "Type Line"])
 
     filtered_df = df[~df['Type Line'].apply(lambda x: 'token' in x.lower()
                                                       or 'card' in x.lower() or 'scheme' in x.lower()
@@ -47,33 +49,23 @@ def get_dataframe():
     # Print the DataFrame
     return df
 
-def analyze(keywords):
+def analyze():
     df = get_dataframe()
+
+    df = df.drop(['Card Name', 'Mana Cost', 'Color Identity', 'Rarity', 'Type Line'], axis=1)
+    st.dataframe(df)
 
     vect = CountVectorizer()
     wordsCountArray = vect.fit_transform(df['Oracle Text'])
 
-    X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, df['Colors'], test_size=0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, df['Color'], test_size=0.2, random_state=0)
 
     model = MultinomialNB()
     model.fit(X_train, y_train)
 
-    # Calculate the likelihood of each color for the given keywords
-    keyword_text = " ".join(keywords)
-    keyword_vector = vect.transform([keyword_text])
-
-    likelihood = model.predict_proba(keyword_vector)
-    colors = model.classes_
-
-    s = f"Likelihood of Colors for Keywords: {', '.join(keywords)}\n\n"
-
-    for color, prob in zip(colors, likelihood[0]):
-        s += f"{color}: {prob * 100:.2f}%\n"
+    s = f"Model trained for {X_train.shape[0]} cards. \n\n"
+    s += f"Model Accuracy: {model.score(X_test, y_test) * 100:.2f}%"
 
     st.markdown(s)
 
     return model, vect
-
-# Example usage:
-#selected_keywords = ["power", "toughness"]  # Replace with your chosen keywords
-#model, vect = analyze(selected_keywords)
