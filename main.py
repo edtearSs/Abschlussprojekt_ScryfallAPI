@@ -43,18 +43,7 @@ with col1:
     st.dataframe(st.session_state.data, width=800)
 
 with col2:
-    selection = st.multiselect("Oracle Text", st.session_state.data.keys())
-
-    analyse = st.button("Analysiere ausgewählte Keywords", help="Erstellt ein Modell mit den ausgewählten Keywords.")
-
-    if analyse and selection != []:
-        m = {}
-
-        for sel in selection:
-            m[sel] = st.session_state.data[sel]
-
-        if m != {}:
-            st.session_state.model, st.session_state.vect = analyze(m)
+    st.session_state.model, st.session_state.vect = analyze()
 
     text = st.text_input("Which color is this text most likely to be part of?")
 
