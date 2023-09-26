@@ -5,7 +5,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 
-from scryfallAPI import get_bulk_data
 
 def get_dataframe(data):
     rows = []
@@ -25,7 +24,6 @@ def get_dataframe(data):
         color_str = ', '.join(colors)
 
         rows.append([card_name, mana_cost, oracle_text, color_str, color_identity, rarity, type_line, released_at])
-
 
     # Create a DataFrame from the list of rows
     df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity",
@@ -53,17 +51,19 @@ def get_dataframe(data):
     # Print the DataFrame
     return df
 
+
 def analyze(df):
     # Create a separate DataFrame for single-colored cards
     single_color_df = df[df['Colors'].apply(lambda x: len(x.split(', ')) == 1)]
 
     single_color_df = single_color_df.drop(['Card Name', 'Mana Cost', 'Color Identity', 'Rarity', 'Type Line'], axis=1)
-    #st.dataframe(single_color_df, width=700)
+    # st.dataframe(single_color_df, width=700)
 
     vect = CountVectorizer()
     wordsCountArray = vect.fit_transform(single_color_df['Oracle Text'])
 
-    X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, single_color_df['Colors'], test_size=0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, single_color_df['Colors'], test_size=0.2,
+                                                        random_state=0)
 
     model = MultinomialNB()
     model.fit(X_train, y_train)
