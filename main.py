@@ -10,7 +10,7 @@ st.set_page_config(layout="wide")
 sns.set_theme()
 
 if "vect" not in st.session_state:
-     st.session_state.vect = None
+    st.session_state.vect = None
 
 if "model" not in st.session_state:
     st.session_state.model = None
@@ -55,8 +55,8 @@ btn1 = st.button("Press this button to show the entire Dataframe")
 if btn1:
     st.dataframe(df, width=1600)
 
-#st.subheader("Pair Plot")
-#with st.expander("Click to show Pair Plot"):
+# st.subheader("Pair Plot")
+# with st.expander("Click to show Pair Plot"):
 #    sns.set(style="ticks")
 #    g = sns.pairplot(df, hue='Colors')
 #    st.pyplot(g)
@@ -67,10 +67,10 @@ with col1:
     st.subheader(f"Model for {date1}")
     filtered_df_date1 = df[df['Release Date'] <= date1]
     st.session_state.model, st.session_state.vect = analyze(filtered_df_date1)
-    #st.session_state.model, st.session_state.vect = analyze(df[df['Release Date'] <= date1])
+    # st.session_state.model, st.session_state.vect = analyze(df[df['Release Date'] <= date1])
 
     text1 = col1.text_input("Which color is this text most likely to be part of?", key="t1",
-                          value="Destroy target Creature")
+                            value="Destroy target Creature")
 
     if st.session_state.model is not None and st.session_state.vect is not None:
         propas = st.session_state.model.predict_proba(st.session_state.vect.transform([text1]))
@@ -84,10 +84,10 @@ with col2:
     st.subheader(f"Model for {date2}")
     filtered_df_date2 = df[df['Release Date'] <= date2]
     st.session_state.model, st.session_state.vect = analyze(filtered_df_date2)
-    #st.session_state.model, st.session_state.vect = analyze(df[df['Release Date'] <= date2])
+    # st.session_state.model, st.session_state.vect = analyze(df[df['Release Date'] <= date2])
 
     text2 = col2.text_input("Which color is this text most likely to be part of?", key="t2",
-                          value="Draw a Card")
+                            value="Draw a Card")
 
     if st.session_state.model is not None and st.session_state.vect is not None:
         propas = st.session_state.model.predict_proba(st.session_state.vect.transform([text2]))
