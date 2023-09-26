@@ -31,6 +31,8 @@ def get_dataframe(data):
     df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity",
                                      "Type Line", "Release Date"])
 
+    df['Release Date'] = pd.to_datetime(df['Release Date'])
+
     filtered_df = df[~df['Type Line'].apply(lambda x: 'token' in x.lower()
                                                       or 'card' in x.lower() or 'scheme' in x.lower()
                                                       or 'vanguard' in x.lower() or 'emblem' in x.lower()
