@@ -24,7 +24,7 @@ if "data" not in st.session_state:
 if "df" not in st.session_state:
     st.session_state.df = df
 
-date1 = st.sidebar.date_input("Choose the Release Dates for the Data you want to use.", value=datetime.datetime.now(),
+date1 = st.sidebar.date_input("Choose the Release Date for the Data you want to use.", value=datetime.date(2000, 11, 1),
                               min_value=datetime.date(1993, 11, 1))
 date1 = pd.to_datetime(date1)
 date2 = st.sidebar.date_input("Choose a second Date to compare the Data.", value=datetime.datetime.now(),
@@ -41,8 +41,16 @@ class_name_mapping = {'': 'Colorless',
 
 if name:
     try:
-        data = fetch_card(name.lower())
-        st.sidebar.write(data)
+        card = fetch_card(name.lower())
+        image_url = card.get("image_uris").get("normal")
+        if image_url:
+            st.sidebar.image(image_url, caption=name.upper())
+        st.sidebar.write("Oracle Text:", card.get("oracle_text"))
+        st.sidebar.write("Mana Cost:", card.get("mana_cost"))
+        st.sidebar.write("Rarity:", card.get("rarity"))
+        st.sidebar.write("Type Line:", card.get("type_line"))
+        st.sidebar.write("Latest Print/Reprint:", card.get("set_name"))
+        st.sidebar.write(card)
     except MaximumRequestDone:
         st.error("Maximum number of requests reached. Please try again later.")
     except WrongCardName:
@@ -51,15 +59,19 @@ if name:
         st.error(f"An error occurred: {str(e)}")
 
 st.subheader("Complete Card Dataframe")
-btn1 = st.button("Press this button to show the entire Dataframe")
-if btn1:
+with st.expander("Click to show Dataframe"):
     st.dataframe(df, width=1600)
+    # st.write(df.dtypes)
 
 # st.subheader("Pair Plot")
 # with st.expander("Click to show Pair Plot"):
-#    sns.set(style="ticks")
-#    g = sns.pairplot(df, hue='Colors')
-#    st.pyplot(g)
+#     sns.set(style="ticks")
+#     df['Colors'] = df['Colors'].apply(lambda x: ', '.join(x) if isinstance(x, list) else x)
+#     df['Color Identity'] = df['Color Identity'].apply(lambda x: ', '.join(x) if isinstance(x, list) else x)
+#     st.write(df.head(30))
+#     sns.pairplot(data=df)
+
+df['Release Date'] = pd.to_datetime(df['Release Date'])
 
 col1, col2 = st.columns([1, 1])
 
@@ -70,7 +82,7 @@ with col1:
     # st.session_state.model, st.session_state.vect = analyze(df[df['Release Date'] <= date1])
 
     text1 = col1.text_input("Which color is this text most likely to be part of?", key="t1",
-                            value="Destroy target Creature")
+                            value="Draw a card")
 
     if st.session_state.model is not None and st.session_state.vect is not None:
         propas = st.session_state.model.predict_proba(st.session_state.vect.transform([text1]))
@@ -79,6 +91,8 @@ with col1:
             original_class_name = st.session_state.model.classes_[i]
             new_class_name = class_name_mapping.get(original_class_name, original_class_name)
             st.markdown(f"**{new_class_name}**: {propas[0][i] * 100:.2f} % ")
+
+    # sns.pairplot(filtered_df_date1)
 
 with col2:
     st.subheader(f"Model for {date2}")
@@ -96,3 +110,5 @@ with col2:
             original_class_name = st.session_state.model.classes_[i]
             new_class_name = class_name_mapping.get(original_class_name, original_class_name)
             st.markdown(f"**{new_class_name}**: {propas[0][i] * 100:.2f} % ")
+
+    # sns.pairplot(filtered_df_date2)
