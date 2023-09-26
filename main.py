@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime
-from scryfallAPI import fetch_card, MaximumRequestDone, WrongCardName
+from scryfallAPI import fetch_card, MaximumRequestDone, WrongCardName, get_bulk_data
 from naive_bayes_machine_learning import get_dataframe, analyze
 
 st.set_page_config(layout="wide")
@@ -23,9 +23,15 @@ if "model" not in st.session_state:
     # (https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html#sklearn.naive_bayes.MultinomialNB)
     st.session_state.model = None
 
+data = get_bulk_data()
+df = get_dataframe(data)
+
 if "data" not in st.session_state:
     # Hier muss der Dataframe in den session state aufgenommen werden
-    st.session_state.data = get_dataframe()
+    st.session_state.data = data
+
+if "df" not in st.session_state:
+    st.session_state.df = df
 
 date1 = st.sidebar.date_input("Choose the Release Dates for the Data you want to use.", value=datetime.datetime.now(),
                               min_value=datetime.date(1993, 11, 1))
@@ -46,7 +52,7 @@ if name:
 
 btn1 = st.button("Press this button to show the entire Dataframe")
 if btn1:
-    st.dataframe(st.session_state.data, width=1600)
+    st.dataframe(df, width=1600)
 
 class_name_mapping = {'': 'Colorless',
                       'B': 'Black',
@@ -56,7 +62,7 @@ class_name_mapping = {'': 'Colorless',
                       'W': 'White'}
 
 with col1:
-    st.session_state.model, st.session_state.vect = analyze()
+    st.session_state.model, st.session_state.vect = analyze(df)
 
     text1 = col1.text_input("Which color is this text most likely to be part of?", key="t1",
                           value="Destroy target Creature")
@@ -70,7 +76,7 @@ with col1:
             st.markdown(f"**{new_class_name}**: {propas[0][i] * 100:.2f} % ")
 
 with col2:
-    st.session_state.model, st.session_state.vect = analyze()
+    st.session_state.model, st.session_state.vect = analyze(df)
 
     text2 = col2.text_input("Which color is this text most likely to be part of?", key="t2",
                           value="Draw a Card")

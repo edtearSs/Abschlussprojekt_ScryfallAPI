@@ -7,8 +7,7 @@ from sklearn.naive_bayes import MultinomialNB
 
 from scryfallAPI import get_bulk_data
 
-def get_dataframe():
-    data = get_bulk_data()
+def get_dataframe(data):
     rows = []
 
     # Iterate through the data and append rows to the list
@@ -52,14 +51,12 @@ def get_dataframe():
     # Print the DataFrame
     return df
 
-def analyze():
-    df = get_dataframe()
-
+def analyze(df):
     # Create a separate DataFrame for single-colored cards
     single_color_df = df[df['Colors'].apply(lambda x: len(x.split(', ')) == 1)]
 
     single_color_df = single_color_df.drop(['Card Name', 'Mana Cost', 'Color Identity', 'Rarity', 'Type Line'], axis=1)
-    st.dataframe(single_color_df, width=700)
+    #st.dataframe(single_color_df, width=700)
 
     vect = CountVectorizer()
     wordsCountArray = vect.fit_transform(single_color_df['Oracle Text'])
