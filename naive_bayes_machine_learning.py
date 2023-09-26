@@ -20,14 +20,17 @@ def get_dataframe():
         color_identity = currentItem.get("color_identity", [])
         rarity = currentItem.get("rarity", "")
         type_line = currentItem.get("type_line", "")
+        released_at = currentItem.get("released_at", "")
 
         # Create a list of colors as a string
         color_str = ', '.join(colors)
 
-        rows.append([card_name, mana_cost, oracle_text, color_str, color_identity, rarity, type_line])
+        rows.append([card_name, mana_cost, oracle_text, color_str, color_identity, rarity, type_line, released_at])
+
 
     # Create a DataFrame from the list of rows
-    df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity", "Type Line"])
+    df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity",
+                                     "Type Line", "Release Date"])
 
     filtered_df = df[~df['Type Line'].apply(lambda x: 'token' in x.lower()
                                                       or 'card' in x.lower() or 'scheme' in x.lower()
@@ -56,7 +59,7 @@ def analyze():
     single_color_df = df[df['Colors'].apply(lambda x: len(x.split(', ')) == 1)]
 
     single_color_df = single_color_df.drop(['Card Name', 'Mana Cost', 'Color Identity', 'Rarity', 'Type Line'], axis=1)
-    st.dataframe(single_color_df)
+    st.dataframe(single_color_df, width=700)
 
     vect = CountVectorizer()
     wordsCountArray = vect.fit_transform(single_color_df['Oracle Text'])
