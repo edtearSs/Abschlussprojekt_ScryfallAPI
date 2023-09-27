@@ -35,4 +35,5 @@
 25.09.2023 3. changed dataframe filtering to not include multicolored and colorless magic cards to simplify the data for the algorithm
 25.09.2023 4. updated analyze() function to correctly train the model for the project
 26.09.2023 1. Field-Tested specific cards for the algorithm --> Accuracy way higher than the model accuracy shows.
+27.09.2023 1. Tried Figuring out how to change the the dataframe to use it with sns.pairplot without changing too much... Couldn't figure it out even after working on it for 5 hours. discarded changes
 
