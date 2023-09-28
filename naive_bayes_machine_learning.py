@@ -8,9 +8,10 @@ from sklearn.naive_bayes import MultinomialNB
 
 def get_dataframe(data):
     rows = []
+    progressbar = st.progress(0)
 
     # Iterate through the data and append rows to the list
-    for currentItem in data:
+    for i, currentItem in enumerate(data):
         card_name = currentItem.get("name", "")
         mana_cost = currentItem.get("mana_cost", "")
         oracle_text = currentItem.get("oracle_text", "")
@@ -22,8 +23,13 @@ def get_dataframe(data):
 
         # Create a list of colors as a string
         color_str = ', '.join(colors)
+        color_identity_str = ', '.join(color_identity)
 
-        rows.append([card_name, mana_cost, oracle_text, color_str, color_identity, rarity, type_line, released_at])
+        rows.append([card_name, mana_cost, oracle_text, color_str, color_identity_str, rarity, type_line, released_at])
+
+        progressbar.progress((i + 1) / len(data))
+
+    progressbar.empty()
 
     # Create a DataFrame from the list of rows
     df = pd.DataFrame(rows, columns=["Card Name", "Mana Cost", "Oracle Text", "Colors", "Color Identity", "Rarity",
@@ -46,7 +52,8 @@ def get_dataframe(data):
     # Drop rows with missing values in specified columns
     df = filtered_df_copy.dropna(axis='index', subset=['Oracle Text'])
 
-    # Print the DataFrame
+    df = df.astype("string")
+
     return df
 
 
