@@ -1,5 +1,5 @@
 import requests
-import json
+import streamlit as st
 
 CARD_URL = "https://api.scryfall.com/cards/named?fuzzy"
 
