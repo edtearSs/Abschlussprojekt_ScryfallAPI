@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
+# from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def get_dataframe(data):
@@ -65,6 +66,7 @@ def analyze(df):
     # st.dataframe(single_color_df, width=700)
 
     vect = CountVectorizer()
+    #vect = TfidfVectorizer()
     wordsCountArray = vect.fit_transform(single_color_df['Oracle Text'])
 
     X_train, X_test, y_train, y_test = train_test_split(wordsCountArray, single_color_df['Colors'], test_size=0.2,
